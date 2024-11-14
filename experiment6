@@ -1,0 +1,75 @@
+CREATE DATABASE SchoolManagement;
+USE SchoolManagement;
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    course_id INT,
+    grade DECIMAL(3, 2),
+    CHECK (age >= 10)   
+);
+ 
+CREATE TABLE Courses (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    department VARCHAR(50)
+);
+ALTER TABLE Students MODIFY grade DECIMAL(5, 2);
+
+ 
+INSERT INTO Students (student_id, name, age, course_id, grade) VALUES
+(1, 'Alice', 20, 101, 85.5),
+(2, 'Bob', 22, 102, 72.0),
+(3, 'Carol', 19, 103, 88.0),
+(4, 'David', 21, 101, 91.0),
+(5, 'Eve', 20, 102, 76.5);
+
+
+ 
+INSERT INTO Courses (course_id, course_name, department) VALUES
+(101, 'Mathematics', 'Science'),
+(102, 'English', 'Arts'),
+(103, 'Physics', 'Science'),
+(104, 'History', 'Arts');
+
+SELECT name, grade
+FROM Students
+WHERE grade > ANY (SELECT grade FROM Students WHERE course_id = 102);
+
+SELECT name, grade
+FROM Students
+WHERE grade > ALL (SELECT grade FROM Students WHERE course_id = 101);
+
+SELECT name
+FROM Students
+WHERE course_id IN (SELECT course_id FROM Courses WHERE department = 'Science');
+
+SELECT name
+FROM Students s
+WHERE EXISTS (SELECT * FROM Courses c WHERE c.course_id = s.course_id AND c.department = 'Arts');
+
+SELECT name
+FROM Students
+WHERE course_id NOT IN (SELECT course_id FROM Courses WHERE department = 'Science');
+
+
+SELECT name
+FROM Students
+WHERE course_id IN (SELECT course_id FROM Courses WHERE department = 'Science')
+UNION
+SELECT name
+FROM Students
+WHERE course_id IN (SELECT course_id FROM Courses WHERE department = 'Arts');
+
+SELECT name
+FROM Students
+WHERE course_id IN (SELECT course_id FROM Courses WHERE department = 'Science')
+intersect 
+SELECT name
+FROM Students
+WHERE course_id IN (SELECT course_id FROM Courses WHERE department = 'Arts');
+
+
+ALTER TABLE Students
+ADD CONSTRAINT unique_name UNIQUE (name);
